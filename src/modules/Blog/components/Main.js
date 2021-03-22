@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Typewriter from "typewriter-effect";
+import Typist from 'react-typist';
 import { Transition } from "react-transition-group";
 import { MainIllust } from "../../../assets";
 import Spinner from "../../../shared/components/Spinner";
@@ -29,17 +29,11 @@ const Main = () => {
         {loaded ? (
           <div className="col-12 col-md-6 d-flex flex-column text-center justify-content-center align-items-center p-5">
             <div className="type-writer py-4 px-0">
-              <Typewriter
-                onInit={(typewriter) => {
-                  typewriter
-                    .typeString("انتظرونا قريبا...<br/>")
-                    .typeString("Coming Soon...")
-                    .start()
-                    .callFunction(() => {
-                      setInProp(true);
-                    });
-                }}
-              />
+              <Typist avgTypingDelay={140} onTypingDone={() => setInProp(true)}>
+                انتظرونا قريبا...
+                    <br />
+                    Coming Soon...
+              </Typist>
             </div>
             <Transition in={inProp} timeout={500}>
               {(state) => (
