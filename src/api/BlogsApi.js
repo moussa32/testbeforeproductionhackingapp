@@ -9,6 +9,8 @@ export const getBlogsList = (pageNumber) => axios.get(`${blogsURL}?page=${pageNu
 
 export const getBlogsBySearch = (queryPageNum, keyword) => axios.get(`${apiUrl}/blogs?page=${queryPageNum}&search=${keyword}`);
 
+export const getFeaturedBlogs = () => axios.get(`${blogsURL}/important`);
+
 export const getBlogDetails = (id) => axios.get(`${blogsURL}/${id}/`);
 
 export const searchByCategory = (category) =>
