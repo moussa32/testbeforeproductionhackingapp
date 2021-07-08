@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
+import { apiUrl } from '../../../../api/Constants';
 
 import CustomSelect from '../../../../shared/components/FormFields/CustomSelect';
 import BlogCard from './BlogCard';
@@ -33,6 +35,9 @@ const BlogsList = ({ categories, blogsList }) => {
         (blog) => blog.category === currentFilter.id
       );
       blogsCount = sortedBlogs.length;
+    } else if (currentSearch) {
+      sortedBlogs = currentSearch;
+      blogsCount = sortedBlogs.length;
     }
 
     if (currentSort.id === 0) {
@@ -44,28 +49,7 @@ const BlogsList = ({ categories, blogsList }) => {
     setSortedBlogs([...sortedBlogs]);
     setCurrentPageBlogs([...sortedBlogs.slice(0, perPage)]);
     setPageCount(blogsCount / perPage);
-  }, [blogsList, currentFilter, currentSort]);
-
-  useEffect(() => {
-    let sortedBlogs = [...blogsList];
-    let blogsCount = blogsList.length;
-
-    if (currentSearch) {
-      sortedBlogs = blogsList.filter(
-        (blog) => {
-          let blogName = blog.title;
-          if (blogName.indexOf(query) > -1) {
-            return blog
-          }
-        }
-      );
-      blogsCount = sortedBlogs.length;
-    }
-
-    setSortedBlogs([...sortedBlogs]);
-    setCurrentPageBlogs([...sortedBlogs.slice(0, perPage)]);
-    setPageCount(blogsCount / perPage);
-  }, [blogsList, currentSearch, currentSort]);
+  }, [blogsList, currentFilter, currentSort, currentSearch]);
 
   useEffect(() => {
     const filters = [];
@@ -92,7 +76,10 @@ const BlogsList = ({ categories, blogsList }) => {
 
   const onSearchForm = (e) => {
     e.preventDefault();
-    setCurrentSearch(query);
+    axios.get(`${apiUrl}/blogs?search=${query}`)
+      .then(res => {
+        setCurrentSearch(res.data.results);
+      })
   };
 
   const onSearchInput = (e) => {
