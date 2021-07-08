@@ -14,8 +14,10 @@ const BlogsList = ({ categories, blogsList }) => {
   const [categoriesFilters, setCategoriesFilters] = useState([]);
   const [pageCount, setPageCount] = useState(1);
   const [sortedBlogs, setSortedBlogs] = useState([]);
+  const [query, setQuery] = useState([]);
   const [currentPageBlogs, setCurrentPageBlogs] = useState([]);
   const [currentFilter, setCurrentFilter] = useState(null);
+  const [currentSearch, setCurrentSearch] = useState(null);
   const [currentSort, setCurrentSort] = useState({
     id: 0,
     label: 'الأحدث',
@@ -45,6 +47,27 @@ const BlogsList = ({ categories, blogsList }) => {
   }, [blogsList, currentFilter, currentSort]);
 
   useEffect(() => {
+    let sortedBlogs = [...blogsList];
+    let blogsCount = blogsList.length;
+
+    if (currentSearch) {
+      sortedBlogs = blogsList.filter(
+        (blog) => {
+          let blogName = blog.title;
+          if (blogName.indexOf(query) > -1) {
+            return blog
+          }
+        }
+      );
+      blogsCount = sortedBlogs.length;
+    }
+
+    setSortedBlogs([...sortedBlogs]);
+    setCurrentPageBlogs([...sortedBlogs.slice(0, perPage)]);
+    setPageCount(blogsCount / perPage);
+  }, [blogsList, currentSearch, currentSort]);
+
+  useEffect(() => {
     const filters = [];
 
     if (categories) {
@@ -65,6 +88,15 @@ const BlogsList = ({ categories, blogsList }) => {
 
   const onSortChange = (option) => {
     setCurrentSort(option);
+  };
+
+  const onSearchForm = (e) => {
+    e.preventDefault();
+    setCurrentSearch(query);
+  };
+
+  const onSearchInput = (e) => {
+    setQuery(e.target.value);
   };
 
   const handlePageClick = (data) => {
@@ -102,6 +134,16 @@ const BlogsList = ({ categories, blogsList }) => {
           />
         </div>
         <div className="main p-0 col-md-9">
+          <form className="mb-4" onSubmit={onSearchForm}>
+            <div className="form-row">
+              <div className="col-md-9 col-sm-8">
+                <input type="text" className="form-control custom-input" placeholder="أبحث عن تدوينة معينة بالعنوان" onChange={onSearchInput} />
+              </div>
+              <div className="col-md-3 col-sm-4">
+                <button type="submit" className="btn btn-lightgreen w-100">البحث</button>
+              </div>
+            </div>
+          </form>
           {sortedBlogs.length > 0 ? (
             currentPageBlogs.length > 0 &&
             currentPageBlogs.map((blog) => (
