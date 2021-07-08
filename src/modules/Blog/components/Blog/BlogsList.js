@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { useHistory } from "react-router-dom";
 import { BiSearchAlt } from "react-icons/bi";
 import { getBlogsBySearch } from "../../../../api/BlogsApi";
@@ -20,8 +20,8 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
   const [pageCount, setPageCount] = useState(1);
   const [sortedBlogs, setSortedBlogs] = useState([]);
   const [query, setQuery] = useState([]);
-  const [currentPageNum, setCurrentPageNum] = useState(1);
   const [currentPageBlogs, setCurrentPageBlogs] = useState([]);
+  const [currentPageNum, setCurrentPageNum] = useState(1);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [currentSearch, setCurrentSearch] = useState(null);
   const [currentSort, setCurrentSort] = useState({
@@ -42,7 +42,7 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
 
     } else if (currentSearch) {
       sortedBlogs = currentSearch.results;
-      blogsCount = sortedBlogs.count;
+      blogsCount = currentSearch.count;
     }
 
     if (currentSort.id === 0) {
@@ -55,6 +55,7 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
     setCurrentPageBlogs([...sortedBlogs.slice(0, perPage)]);
     setPageCount(blogsCount / perPage);
   }, [blogsList, currentFilter, currentSort, currentSearch]);
+
 
   useEffect(() => {
     const filters = [];
@@ -75,41 +76,61 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
     setCurrentFilter(filter);
   };
 
-  const onSortChange = (option) => {
-    setCurrentSort(option);
-  };
-
   const onSearchForm = (e) => {
     e.preventDefault();
-    getBlogsBySearch(currentPageNum, query)
-      .then(res => {
-        setCurrentSearch(res.data);
-        setPageCount(res.data.count);
-      })
+
+    console.log(query.length);
+    if (query.length == 0) {
+      setCurrentPageBlogs([...sortedBlogs]);
+      setCurrentPageNum(1);
+      history.push(`/blog?page=1`);
+      getBlogsBySearch(currentPageNum, query)
+        .then(res => {
+          setCurrentSearch(res.data);
+          setPageCount(res.data.count);
+        })
+    } else {
+      setCurrentPageNum(1);
+      history.push(`/blog?page=1&search=${query}`);
+      getBlogsBySearch(currentPageNum, query)
+        .then(res => {
+          setCurrentSearch(res.data);
+          setPageCount(res.data.count);
+        })
+        .catch(function (error) {
+          if (error.response.status == 404) {
+            setSortedBlogs([]);
+          }
+        })
+    }
   };
 
   const onSearchInput = (e) => {
     setQuery(e.target.value);
   };
 
+  const onSortChange = (option) => {
+    setCurrentSort(option);
+  };
+
   const handlePageClick = (data) => {
     const selected = data.selected + 1;
-    setCurrentPageNum(selected);
 
-    history.push(`/blog?page=${selected}`);
+    if (query.length > 0) {
+      history.push(`/blog?page=${selected}&search=${query}`);
+      getBlogsBySearch(selected, query)
+        .then(res => {
+          setCurrentSearch(res.data);
+          setPageCount(res.data.count);
+        })
+    } else {
 
-    setCurrentPageBlogs([...sortedBlogs]);
+      setCurrentPageNum(selected);
 
-    getBlogsBySearch(currentPageNum, query)
-      .then(res => {
-        setCurrentSearch(res.data);
-        setPageCount(res.data.count);
-      })
-      .catch(function (error) {
-        if (error.response.status == 404) {
-          setSortedBlogs([]);
-        }
-      })
+      history.push(`/blog?page=${selected}`);
+
+      setCurrentPageBlogs([...sortedBlogs]);
+    }
   };
 
   return (
