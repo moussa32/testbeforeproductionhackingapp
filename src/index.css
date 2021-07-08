@@ -67,6 +67,26 @@ p {
   font-size: calc(0.5rem + 0.2vw);
 }
 
+.custom-input{
+  padding: 0 .75rem;
+  background-color: #313131;
+  color:white;
+}
+
+.custom-input:focus, .custom-input:active{
+  background-color: #313131;
+  color: white;
+  border-color: var(--lightGreen);
+}
+
+.btn-lightgreen{
+  color:white;
+  background-color: var(--lightGreen);
+  border-color: var(--lightGreen);
+  padding: 0.5rem 2.5rem;
+  transition: 0.5s;
+}
+
 @media screen and (max-width: 450px) {
   .blog-container .body img {
     width: 100% !important;
