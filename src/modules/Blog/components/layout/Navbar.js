@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-import { WhiteLogo } from "../../../../assets/index";
+import { GreenLogo } from "../../../../assets/index";
 
 const Navbar = ({ currentPathname }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +24,7 @@ const Navbar = ({ currentPathname }) => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark blog-nav">
       <Link className="navbar-brand" to="/">
-        <img src={WhiteLogo} width={30} height={30} alt="logo" loading="lazy" />
+        <img src={GreenLogo} width={30} height={30} alt="logo" loading="lazy" />
       </Link>
       <button
         className="navbar-toggler"
