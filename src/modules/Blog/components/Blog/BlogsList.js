@@ -2,14 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import axios from 'axios';
 import { apiUrl } from '../../../../api/Constants';
+import { useParams, useHistory } from "react-router-dom";
 import { BiSearchAlt } from "react-icons/bi";
 
 import CustomSelect from '../../../../shared/components/FormFields/CustomSelect';
 import BlogCard from './BlogCard';
 import Pagination from '../layout/Pagination';
 
-const BlogsList = ({ categories, blogsList }) => {
+const BlogsList = ({ categories, blogsList, pagination }) => {
   const perPage = 5;
+  let history = useHistory();
   const sortOptions = [
     { id: 0, label: 'الأحدث', value: 'الأحدث' },
     { id: 1, label: 'الأقدم', value: 'الأقدم' },
@@ -29,7 +31,7 @@ const BlogsList = ({ categories, blogsList }) => {
 
   useEffect(() => {
     let sortedBlogs = [...blogsList];
-    let blogsCount = blogsList.length;
+    let blogsCount = pagination.count;
 
     if (currentFilter) {
       sortedBlogs = blogsList.filter(
@@ -88,9 +90,9 @@ const BlogsList = ({ categories, blogsList }) => {
   };
 
   const handlePageClick = (data) => {
-    const selected = data.selected;
-    const offset = Math.ceil(selected * perPage);
-    setCurrentPageBlogs([...sortedBlogs.slice(offset, offset + perPage)]);
+    const selected = data.selected + 1;
+    history.push(`/blog?page=${selected}`);
+    setCurrentPageBlogs([...sortedBlogs]);
   };
 
   return (
@@ -153,7 +155,7 @@ const BlogsList = ({ categories, blogsList }) => {
           )}
         </div>
       </div>
-      {sortedBlogs.length > perPage ? (
+      {sortedBlogs.length >= perPage ? (
         <Pagination pageCount={pageCount} handlePageClick={handlePageClick} />
       ) : null}
     </div>
@@ -164,6 +166,7 @@ const mapStateToProps = ({ blogs }) => {
   return {
     categories: blogs.categories,
     blogsList: blogs.blogsList,
+    pagination: blogs.pagination,
   };
 };
 

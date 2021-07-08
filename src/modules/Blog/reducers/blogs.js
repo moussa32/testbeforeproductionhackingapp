@@ -2,6 +2,7 @@ import {
   GET_CATEGORIES,
   GET_BLOGS,
   GET_BLOG,
+  GET_PAGINATION,
   GET_HOME_ADS,
   GET_BLOG_AD,
 } from '../actions/types';
@@ -9,6 +10,7 @@ import {
 const initialState = {
   categories: [],
   blogsList: [],
+  pagination: {},
   blog: null,
 };
 
@@ -23,6 +25,11 @@ export default function blogs(state = initialState, action) {
       return {
         ...state,
         blogsList: [...action.blogs],
+      };
+    case GET_PAGINATION:
+      return {
+        ...state,
+        pagination: { ...action.pagination },
       };
     case GET_BLOG:
       return {
