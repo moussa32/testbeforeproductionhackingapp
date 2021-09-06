@@ -1,11 +1,12 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 import {
   FaTwitterSquare,
+  FaFacebookSquare,
   FaSnapchatSquare,
-  FaYoutube,
   FaTelegramPlane,
-} from 'react-icons/fa';
+  FaInstagram,
+} from "react-icons/fa";
 
 const Footer = () => {
   return (
@@ -15,59 +16,52 @@ const Footer = () => {
           <div className="row">
             <div className="col-md-4">
               <div className="footer-col first">
-                <h5 style={{ color: 'rgb(243, 247, 253)' }}>
-                  Hacking Technology
-                </h5>
+                <h5 style={{ color: "rgb(243, 247, 253)" }}>Hacking Technology</h5>
                 <p className="p-medium py-3">
-                  شركة{' '}
-                  <strong style={{ color: '#08cc96' }}>
-                    Hacking Technology
-                  </strong>{' '}
-                  هي شركة عربية برؤية عالمية، تسعى لخلق فضاء الكتروني آمن، وجعل
-                  الانترنت مكاناً أفضل.
+                  شركة <strong style={{ color: "#08cc96" }}>Hacking Technology</strong> هي شركة
+                  عربية برؤية عالمية، تسعى لخلق فضاء الكتروني آمن، وجعل الانترنت مكاناً أفضل.
                 </p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="footer-col first">
                 <h5>
-                  <Link
-                    to="/contact-us"
-                    style={{ color: 'rgb(243, 247, 253)' }}
-                  >
+                  <Link to="/contact-us" style={{ color: "rgb(243, 247, 253)" }}>
                     الاتصال بنا
                   </Link>
                 </h5>
                 <p className="p-medium py-3">
-                  يمكنكم الاتصال بنا عند الحاجة من خلال الضغط على رابط اتصل بنا
-                  المتوفر في روابط موقعنا أو الإرسال إلى بريدنا الالكتروني على
-                  اسم النطاق أعلاه
+                  يمكنكم الاتصال بنا عند الحاجة من خلال الضغط على رابط اتصل بنا المتوفر في روابط
+                  موقعنا أو الإرسال إلى بريدنا الالكتروني على اسم النطاق أعلاه
                 </p>
               </div>
             </div>
             <div className="col-md-4">
               <div className="footer-col last">
-                <h5 style={{ color: 'rgb(243, 247, 253)' }}>
-                  وسائل التواصل الاجتماعي
-                </h5>
+                <h5 style={{ color: "rgb(243, 247, 253)" }}>وسائل التواصل الاجتماعي</h5>
                 <ul className="media-list li-space-lg p-medium d-flex px-0 py-3 m-0">
                   <li className="media">
-                    <a href="https://twitter.com/h2ckingtech/">
+                    <a href="https://facebook.com/HTBCSS/" target="_blank">
+                      <FaFacebookSquare />
+                    </a>
+                  </li>
+                  <li className="media">
+                    <a href="https://twitter.com/HTBCSS" target="_blank">
                       <FaTwitterSquare />
                     </a>
                   </li>
                   <li className="media">
-                    <a href="https://www.snapchat.com/add/tzb">
+                    <a href="https://www.Snapchat.com/add/HTBCSS" target="_blank">
                       <FaSnapchatSquare />
                     </a>
                   </li>
                   <li className="media">
-                    <a href="https://www.youtube.com/channel/UC_nkNXJN-v5KXvig99sEBIw">
-                      <FaYoutube />
+                    <a href="https://www.instagram.com/HTBCSS" target="_blank">
+                      <FaInstagram />
                     </a>
                   </li>
                   <li className="media">
-                    <a href="https://t.me/H2ckingTech">
+                    <a href="https://t.me/HTBCSS" target="_blank">
                       <FaTelegramPlane />
                     </a>
                   </li>
