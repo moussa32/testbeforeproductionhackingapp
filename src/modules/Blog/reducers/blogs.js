@@ -2,15 +2,15 @@ import {
   GET_CATEGORIES,
   GET_BLOGS,
   GET_BLOG,
-  GET_PAGINATION,
   GET_HOME_ADS,
   GET_BLOG_AD,
-} from '../actions/types';
+  GET_BLOGS_COUNT,
+} from "../actions/types";
 
 const initialState = {
   categories: [],
   blogsList: [],
-  pagination: {},
+  blogsCount: {},
   blog: null,
 };
 
@@ -26,10 +26,10 @@ export default function blogs(state = initialState, action) {
         ...state,
         blogsList: [...action.blogs],
       };
-    case GET_PAGINATION:
+    case GET_BLOGS_COUNT:
       return {
         ...state,
-        pagination: { ...action.pagination },
+        blogsCount: action.blogsCount,
       };
     case GET_BLOG:
       return {

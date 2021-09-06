@@ -1,6 +1,6 @@
 import ReactPaginate from "react-paginate";
 
-const Pagination = ({ pageCount, handlePageClick }) => {
+const Pagination = ({ pageCount, handlePageClick, resetNumber }) => {
   return (
     <ReactPaginate
       previousLabel={"السابق"}
@@ -11,6 +11,8 @@ const Pagination = ({ pageCount, handlePageClick }) => {
       marginPagesDisplayed={2}
       pageRangeDisplayed={5}
       onPageChange={handlePageClick}
+      initialPage={0}
+      forcePage={resetNumber}
       containerClassName={"pagination d-flex justify-content-center flex-wrap"}
       subContainerClassName={"pages pagination"}
       activeClassName={"active"}

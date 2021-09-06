@@ -4,30 +4,20 @@ import FeaturedBlogs from "../../Blog/components/Home/FeaturedBlogs";
 import AdsBanner from "../../Blog/components/Home/AdsBanner";
 import BlogsList from "../components/Blog/BlogsList";
 
+import { handleGetCategories, handleGetBlogs, handleGetHomeAds } from "../actions/index";
 
-
-import {
-  handleGetCategories,
-  handleGetBlogs,
-  handleGetHomeAds,
-  handleGetPagination,
-} from "../actions/index";
-
-const BlogHome = (props) => {
-  const { dispatch, homeAds, featuredBlogs } = props;
-
-  let pageNumberFromURL = (new URLSearchParams(window.location.search)).get("page") || 1;
+const BlogHome = props => {
+  const { dispatch, homeAds } = props;
 
   useEffect(() => {
     dispatch(handleGetCategories());
-    dispatch(handleGetPagination(pageNumberFromURL));
-    dispatch(handleGetBlogs(pageNumberFromURL));
+    dispatch(handleGetBlogs(1));
     dispatch(handleGetHomeAds());
-  }, [dispatch, pageNumberFromURL]);
+  }, [dispatch]);
 
   return (
     <div className="home blog-wrapper">
-      {featuredBlogs.length > 0 && <FeaturedBlogs />}
+      <FeaturedBlogs />
       <div className="container px-0">
         {homeAds && homeAds.length > 0 && <AdsBanner />}
         <BlogsList />
@@ -39,7 +29,6 @@ const BlogHome = (props) => {
 const mapStateToProps = ({ blogs }) => {
   return {
     homeAds: blogs.homeAds,
-    featuredBlogs: blogs.blogsList.filter((blog) => blog.important === true),
   };
 };
 

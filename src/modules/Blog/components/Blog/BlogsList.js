@@ -1,48 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { connect, useDispatch } from 'react-redux';
+import React, { useState, useEffect } from "react";
+import { connect } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { BiSearchAlt } from "react-icons/bi";
-import { getBlogsBySearch } from "../../../../api/BlogsApi";
-import { getPagination } from "../../actions/index";
+import { getBlogsByCategory, getBlogsBySearch, getBlogsList } from "../../../../api/BlogsApi";
 
-import CustomSelect from '../../../../shared/components/FormFields/CustomSelect';
-import BlogCard from './BlogCard';
-import Pagination from '../layout/Pagination';
+import CustomSelect from "../../../../shared/components/FormFields/CustomSelect";
+import BlogCard from "./BlogCard";
+import Pagination from "../layout/Pagination";
 
-const BlogsList = ({ categories, blogsList, pagination }) => {
+const BlogsList = ({ categories, blogsList, blogsCount }) => {
   const perPage = 5;
   let history = useHistory();
   const sortOptions = [
-    { id: 0, label: 'الأحدث', value: 'الأحدث' },
-    { id: 1, label: 'الأقدم', value: 'الأقدم' },
+    { id: 0, label: "الأحدث", value: "الأحدث" },
+    { id: 1, label: "الأقدم", value: "الأقدم" },
   ];
   const [categoriesFilters, setCategoriesFilters] = useState([]);
   const [pageCount, setPageCount] = useState(1);
   const [sortedBlogs, setSortedBlogs] = useState([]);
   const [query, setQuery] = useState([]);
   const [currentPageBlogs, setCurrentPageBlogs] = useState([]);
-  const [currentPageNum, setCurrentPageNum] = useState(1);
+  const [currentPageNum, setCurrentPageNum] = useState(0);
   const [currentFilter, setCurrentFilter] = useState(null);
   const [currentSearch, setCurrentSearch] = useState(null);
   const [currentSort, setCurrentSort] = useState({
     id: 0,
-    label: 'الأحدث',
-    value: 'الأحدث',
+    label: "الأحدث",
+    value: "الأحدث",
   });
 
   useEffect(() => {
     let sortedBlogs = [...blogsList];
-    let blogsCount = pagination.count;
+    let currentBlogsCount = blogsCount;
 
     if (currentFilter) {
-      sortedBlogs = blogsList.filter(
-        (blog) => blog.category === currentFilter.id
-      );
-      blogsCount = sortedBlogs.length;
-
+      sortedBlogs = currentPageBlogs;
+      currentBlogsCount = pageCount;
     } else if (currentSearch) {
       sortedBlogs = currentSearch.results;
-      blogsCount = currentSearch.count;
+      currentBlogsCount = currentSearch.count;
     }
 
     if (currentSort.id === 0) {
@@ -52,16 +48,15 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
     }
 
     setSortedBlogs([...sortedBlogs]);
-    setCurrentPageBlogs([...sortedBlogs.slice(0, perPage)]);
-    setPageCount(blogsCount / perPage);
-  }, [blogsList, currentFilter, currentSort, currentSearch]);
-
+    setCurrentPageBlogs([...sortedBlogs]);
+    setPageCount(currentBlogsCount / perPage);
+  }, [blogsList, currentFilter, currentSort, currentSearch, currentPageNum]);
 
   useEffect(() => {
     const filters = [];
 
     if (categories) {
-      categories.forEach((category) =>
+      categories.forEach(category =>
         filters.push({
           id: category.id,
           label: category.title,
@@ -72,27 +67,28 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
     }
   }, [categories]);
 
-  const onFilterChange = (filter) => {
+  const onFilterChange = filter => {
     setCurrentFilter(filter);
+    setCurrentPageNum(0);
+    if (filter) {
+      getBlogsByCategory(filter.value, 1).then(res => {
+        setCurrentPageBlogs(res.data.results);
+        setPageCount(res.data.count / perPage);
+      });
+    } else {
+      setCurrentPageBlogs(blogsList);
+      setPageCount(blogsCount / perPage);
+    }
   };
 
-  const onSearchForm = (e) => {
+  const onSearchForm = e => {
     e.preventDefault();
+    setCurrentPageNum(0);
 
-    console.log(query.length);
     if (query.length == 0) {
       setCurrentPageBlogs([...sortedBlogs]);
-      setCurrentPageNum(1);
-      history.push(`/blog?page=1`);
-      getBlogsBySearch(currentPageNum, query)
-        .then(res => {
-          setCurrentSearch(res.data);
-          setPageCount(res.data.count);
-        })
     } else {
-      setCurrentPageNum(1);
-      history.push(`/blog?page=1&search=${query}`);
-      getBlogsBySearch(currentPageNum, query)
+      getBlogsBySearch(1, query)
         .then(res => {
           setCurrentSearch(res.data);
           setPageCount(res.data.count);
@@ -101,42 +97,43 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
           if (error.response.status == 404) {
             setSortedBlogs([]);
           }
-        })
+        });
     }
   };
 
-  const onSearchInput = (e) => {
+  const onSearchInput = e => {
     setQuery(e.target.value);
   };
 
-  const onSortChange = (option) => {
+  const onSortChange = option => {
     setCurrentSort(option);
   };
 
-  const handlePageClick = (data) => {
+  const handlePageClick = data => {
     const selected = data.selected + 1;
+    setCurrentPageNum(data.selected);
 
     if (query.length > 0) {
-      history.push(`/blog?page=${selected}&search=${query}`);
-      getBlogsBySearch(selected, query)
-        .then(res => {
-          setCurrentSearch(res.data);
-          setPageCount(res.data.count);
-        })
+      getBlogsBySearch(selected, query).then(res => {
+        setCurrentSearch(res.data);
+        setPageCount(res.data.count);
+      });
+    } else if (currentFilter) {
+      getBlogsByCategory(currentFilter.value, selected).then(res => {
+        setCurrentPageBlogs(res.data.results);
+        setPageCount(res.data.count / perPage);
+      });
     } else {
-
-      setCurrentPageNum(selected);
-
-      history.push(`/blog?page=${selected}`);
-
-      setCurrentPageBlogs([...sortedBlogs]);
+      getBlogsList(selected).then(res => {
+        setCurrentPageBlogs(res.data.results);
+      });
     }
   };
 
   return (
     <div className="blogs-list mb-4">
       <div className="blogs-list-title mb-4 text-center">
-        <h2>{currentFilter ? currentFilter.label : 'كل المدونات'}</h2>
+        <h2>{currentFilter ? currentFilter.label : "كل المدونات"}</h2>
       </div>
       <div className="blogs-list-body row">
         <div className="sidenav col-md-3">
@@ -165,36 +162,45 @@ const BlogsList = ({ categories, blogsList, pagination }) => {
           <form className="mb-4" onSubmit={onSearchForm}>
             <div className="form-row">
               <div className="col-md-10 col-sm-10">
-                <input type="text" className="form-control custom-input" placeholder="أبحث عن تدوينة معينة بالعنوان" onChange={onSearchInput} />
+                <input
+                  type="text"
+                  className="form-control custom-input"
+                  placeholder="أبحث عن تدوينة معينة بالعنوان"
+                  onChange={onSearchInput}
+                />
               </div>
               <div className="col-md-2 col-sm-2">
-                <button type="submit" className="btn btn-lightgreen d-block w-100 blog-search-button"><BiSearchAlt /></button>
+                <button
+                  type="submit"
+                  className="btn btn-lightgreen d-block w-100 blog-search-button"
+                >
+                  <BiSearchAlt />
+                </button>
               </div>
             </div>
           </form>
           {sortedBlogs.length > 0 ? (
             currentPageBlogs.length > 0 &&
-            currentPageBlogs.map((blog) => (
+            currentPageBlogs.map(blog => (
               <BlogCard
                 key={blog.id}
                 blog={blog}
-                category={
-                  categories.filter(
-                    (category) => category.id === blog.category
-                  )[0]
-                }
+                category={categories.filter(category => category.id === blog.category)[0]}
               />
             ))
           ) : (
             <div className="alert alert-dark text-center" role="alert">
-              لا يوجد أي مدونات تحت هذه الفئة حتى الآن، يمكنك المحاولة مرة آخرى
-              لاحقًا.
+              لا يوجد أي مدونات تحت هذه الفئة حتى الآن، يمكنك المحاولة مرة آخرى لاحقًا.
             </div>
           )}
         </div>
       </div>
       {sortedBlogs.length >= perPage || sortedBlogs.length >= 1 ? (
-        <Pagination pageCount={pageCount} handlePageClick={handlePageClick} />
+        <Pagination
+          pageCount={pageCount}
+          handlePageClick={handlePageClick}
+          resetNumber={currentPageNum}
+        />
       ) : null}
     </div>
   );
@@ -204,7 +210,7 @@ const mapStateToProps = ({ blogs }) => {
   return {
     categories: blogs.categories,
     blogsList: blogs.blogsList,
-    pagination: blogs.pagination,
+    blogsCount: blogs.blogsCount,
   };
 };
 
